@@ -4,7 +4,8 @@
 // @description    Replaces multiple choice with typing input on Memrise. Learn by typing, not clicking.
 // @match          https://www.memrise.com/*
 // @match          https://app.memrise.com/*
-// @version        1.3.0
+// @match          https://community-courses.memrise.com/*
+// @version        1.4.0
 // @grant          none
 // @run-at         document-idle
 // ==/UserScript==
@@ -145,26 +146,39 @@
   const SKIP_ATTR = "data-mat-skip";
 
   function findMCContainer() {
+    // Primary: main memrise.com — buttons with data-testid="mcResponse*"
     const mcButtons = document.querySelectorAll(
       'button[data-testid^="mcResponse"]'
     );
-    if (mcButtons.length === 0) return null;
+    if (mcButtons.length >= 2) {
+      let container = mcButtons[0].parentElement;
+      if (container) container = container.parentElement;
 
-    let container = mcButtons[0].parentElement;
-    if (container) container = container.parentElement;
-
-    if (container && container.querySelectorAll('button[data-testid^="mcResponse"]').length === mcButtons.length) {
-      return { container, buttons: mcButtons };
-    }
-
-    if (container && container.parentElement) {
-      container = container.parentElement;
-      if (container.querySelectorAll('button[data-testid^="mcResponse"]').length === mcButtons.length) {
+      if (container && container.querySelectorAll('button[data-testid^="mcResponse"]').length === mcButtons.length) {
         return { container, buttons: mcButtons };
       }
+
+      if (container && container.parentElement) {
+        container = container.parentElement;
+        if (container.querySelectorAll('button[data-testid^="mcResponse"]').length === mcButtons.length) {
+          return { container, buttons: mcButtons };
+        }
+      }
+
+      return { container: mcButtons[0].parentElement?.parentElement, buttons: mcButtons };
     }
 
-    return { container: mcButtons[0].parentElement?.parentElement, buttons: mcButtons };
+    // Fallback: community-courses.memrise.com — buttons containing span[dir="auto"]
+    const spanButtons = Array.from(document.querySelectorAll('button span[dir="auto"]'))
+      .map(s => s.closest("button"))
+      .filter((b, i, arr) => b && arr.indexOf(b) === i);
+
+    if (spanButtons.length >= 2) {
+      const container = spanButtons[0].parentElement?.parentElement;
+      if (container) return { container, buttons: spanButtons };
+    }
+
+    return null;
   }
 
   function stripLeadingNumber(str) {
@@ -332,5 +346,5 @@
   });
 
   setTimeout(checkAndReplace, 500);
-  log("Memrise Typing v1.3.0 loaded.");
+  log("Memrise Typing v1.4.0 loaded.");
 })();
