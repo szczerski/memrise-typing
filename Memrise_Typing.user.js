@@ -5,7 +5,7 @@
 // @match          https://www.memrise.com/*
 // @match          https://app.memrise.com/*
 // @match          https://community-courses.memrise.com/*
-// @version        1.4.0
+// @version        1.4.1
 // @grant          none
 // @run-at         document-idle
 // ==/UserScript==
@@ -94,7 +94,9 @@
   }
 
   // ─── DIACRITICS SIMPLIFICATION ───────────────────────────────────
-  // Maps special characters to ASCII equivalents for flexible matching.
+  // Characters that don't decompose under NFD normalization must be mapped
+  // explicitly. Everything else (é→e, ç→c, ê→e, ü→u, etc.) is handled
+  // automatically by the NFD + combining-mark-strip pipeline in simplify().
 
   const CHAR_SIMPLIFY = {
     "\u00f8": "o",   // ø
@@ -110,6 +112,8 @@
     "\u0105": "a",   // ą
     "\u0119": "e",   // ę
     "\u00f3": "o",   // ó
+    "\u0153": "oe",  // œ (French ligature: cœur, sœur, œil)
+    "\u0152": "oe",  // Œ
   };
 
   function simplify(str) {
@@ -126,7 +130,13 @@
 
   function normalize(str) {
     if (!str) return "";
-    let s = str.trim().toLowerCase();
+    let s = str.normalize("NFC").trim().toLowerCase();
+    // Normalize apostrophe variants to straight apostrophe
+    s = s.replace(/[\u2018\u2019\u02bc\u02b9\u0060\u00b4]/g, "'");
+    // Normalize various dash/hyphen variants to regular hyphen
+    s = s.replace(/[\u2010-\u2015\u2212]/g, "-");
+    // Normalize non-breaking spaces and other whitespace variants to regular space
+    s = s.replace(/[\u00a0\u202f\u2009\u2008]/g, " ");
     s = s.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "");
     s = s.replace(/\s+/g, " ");
     return s;

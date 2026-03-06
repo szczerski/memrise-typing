@@ -9,16 +9,21 @@ Works with the **new Memrise UI** (2024/2025+). The old "Memrise All Typing" use
 ## Features
 
 - **Multiple choice replaced with typing** - Instead of picking from 4 buttons, you type the answer yourself
-- **Smart diacritics matching** - Don't have a Norwegian or German keyboard? Type `hoflig` and it matches `høflig`. Works for all common special characters:
+- **Smart diacritics matching** - No special keyboard needed. Type a simplified version and it matches the accented original. Works for French, German, Polish, Norwegian, and more:
 
   | You type | Matches |
   |----------|---------|
-  | `hoflig` | `høflig` |
-  | `uber` | `über` |
+  | `ca va` | `ça va` |
   | `cafe` | `café` |
+  | `etre` | `être` |
+  | `coeur` | `cœur` |
+  | `uber` | `über` |
   | `strasse` | `Straße` |
+  | `hoflig` | `høflig` |
   | `lodz` | `łódź` |
   | `byc` | `być` |
+
+- **Apostrophe & punctuation tolerance** - Curly apostrophes (`'`), typographic dashes (`–`, `—`), and French non-breaking spaces (` `) are all treated as their plain equivalents — so `c'est` matches `c'est` regardless of which apostrophe Memrise stored. Trailing punctuation like `?` or `!` is never required.
 
 - **CJK auto-detection** - Chinese, Japanese, and Korean questions stay as multiple choice (typing without IME makes no sense)
 - **Toggle back to buttons** - Press **Tab** or click "Show buttons" to switch back to multiple choice for any question
@@ -68,7 +73,7 @@ const CONFIG = {
 
 - **Desktop only** - Userscripts don't work on mobile apps
 - **Memrise updates may break it** - If Memrise changes their `data-testid` attributes or DOM structure, the script may need updating. Open an issue if this happens.
-- **Community courses** - Only tested with official Memrise courses on the new UI. Community courses at `community-courses.memrise.com` use a different interface.
+- **Community courses** - Supported at `community-courses.memrise.com`, but uses a different DOM structure so edge cases may appear — open an issue if something doesn't work.
 
 ## Contributing
 
